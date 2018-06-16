@@ -1,7 +1,7 @@
 /*
-* @Author: matthew
+* @Author: matthew.lan
 * @Date:   2018-05-19
-* @Last Modified by:   matthew
+* @Last Modified by:   matthew.lan
 * @Last Modified time: 2018-06-16
 */
 
@@ -16,21 +16,7 @@
 #include <unistd.h>
 
 #include "configparser.h"
-
-
-/**********************************************************
- * Macros
-**********************************************************/
-#define DEBUG_LOG_ON
-
-#ifdef  DEBUG_LOG_ON
-#define DEBUG_LOG(tag, format, ...) \
-        printf("D/%-6s: [%-26s] "format"\n", tag, __func__, ##__VA_ARGS__)
-#else
-#define DEBUG_LOG(tag, format, ...)
-#endif
-
-#define TAG_INI     "INI"
+#include "log/log.h"
 
 
 /**********************************************************
@@ -88,12 +74,12 @@ int cfgp_release(struct configparser *hdl)
         s_head = &hdl->sections.s_list;
         q_list_for_each(s_pos, s_head) {
             s_entry = q_list_entry(s_pos, struct cfgp_sec, s_list);
-            // DEBUG_LOG(TAG_INI, "> %s", s_entry->s_name);
+            // Q_DEBUG_LOG(TAG_CFGP, "> %s", s_entry->s_name);
 
             kv_head = &s_entry->kvs.kv_list;
             q_list_for_each(kv_pos, kv_head) {
                 kv_entry = q_list_entry(kv_pos, struct cfgp_kv, kv_list);
-                // DEBUG_LOG(TAG_INI, "  >> %s = %s", kv_entry->key, kv_entry->value);
+                // Q_DEBUG_LOG(TAG_CFGP, "  >> %s = %s", kv_entry->key, kv_entry->value);
                 if (kv_entry->key) {
                     free(kv_entry->key);
                     kv_entry->key = NULL;
@@ -167,11 +153,11 @@ int cfgp_add_path(struct configparser *hdl, const char *path)
         if (!(c_path = strdup(path))) {
             break;
         }
-        DEBUG_LOG(TAG_INI, "path: %s", c_path);
+        Q_DEBUG_LOG(TAG_CFGP, "path: %s", c_path);
         free(hdl->c_path);
         hdl->c_path = c_path;
     } while (0);
-    DEBUG_LOG(TAG_INI, "hdl: %p, path: %p, ret: %d", hdl, path, ret);
+    Q_DEBUG_LOG(TAG_CFGP, "hdl: %p, path: %p, ret: %d", hdl, path, ret);
     return ret;
 }
 
@@ -244,13 +230,13 @@ static struct cfgp_sec *cfgp_find_section(struct q_list_head *head,
 
     q_list_for_each(pos, head) {
         entry = q_list_entry(pos, struct cfgp_sec, s_list);
-        DEBUG_LOG(TAG_INI, "section: %s, s_name: %s", section, entry->s_name);
+        Q_DEBUG_LOG(TAG_CFGP, "section: %s, s_name: %s", section, entry->s_name);
         if (!strcmp(entry->s_name, section)) {
             s_item = entry;
             break;
         }
     }
-    DEBUG_LOG(TAG_INI, "s_item: %p", s_item);
+    Q_DEBUG_LOG(TAG_CFGP, "s_item: %p", s_item);
     return s_item;
 }
 
@@ -278,7 +264,7 @@ static struct cfgp_kv *cfgp_find_kv(struct q_list_head *head,
             break;
         }
     }
-    DEBUG_LOG(TAG_INI, "kv_item: %p", kv_item);
+    Q_DEBUG_LOG(TAG_CFGP, "kv_item: %p", kv_item);
     return kv_item;
 }
 
@@ -310,7 +296,7 @@ struct cfgp_sec *cfgp_add_section(struct configparser *hdl,
         }
         head = &hdl->sections.s_list;
         if ((s_item = cfgp_find_section(head, section))) {
-            DEBUG_LOG(TAG_INI, "section: %s exists", section);
+            Q_DEBUG_LOG(TAG_CFGP, "section: %s exists", section);
             break;
         }
         if (!(s_item = (struct cfgp_sec *)calloc(1, sizeof(struct cfgp_sec)))) {
@@ -331,7 +317,7 @@ struct cfgp_sec *cfgp_add_section(struct configparser *hdl,
         }
         q_list_add(&s_item->s_list, pos);
     } while (0);
-    DEBUG_LOG(TAG_INI, "hdl: %p, section: %p, s_item: %p", hdl, section, s_item);
+    Q_DEBUG_LOG(TAG_CFGP, "hdl: %p, section: %p, s_item: %p", hdl, section, s_item);
     return s_item;
 }
 
@@ -350,20 +336,20 @@ static int cfgp_mod_kv(struct cfgp_kv *kv_item, const char *value)
     char *kv_value = NULL;
     do {
         if (!strcmp(kv_item->value, value)) {
-            DEBUG_LOG(TAG_INI, "value is the same");
+            Q_DEBUG_LOG(TAG_CFGP, "value is the same");
             ret = 0;
             break;
         }
         if (!(kv_value = strdup(value))) {
-            DEBUG_LOG(TAG_INI, "modify value failed");
+            Q_DEBUG_LOG(TAG_CFGP, "modify value failed");
             break;
         }
-        DEBUG_LOG(TAG_INI, "value: %s -> %s", kv_item->value, kv_value);
+        Q_DEBUG_LOG(TAG_CFGP, "value: %s -> %s", kv_item->value, kv_value);
         free(kv_item->value);
         kv_item->value = kv_value;
         ret               = 0;
     } while (0);
-    DEBUG_LOG(TAG_INI, "ret: %d", ret);
+    Q_DEBUG_LOG(TAG_CFGP, "ret: %d", ret);
     return ret;
 }
 
@@ -402,7 +388,7 @@ static struct cfgp_kv *cfgp_add_kv(struct q_list_head *head,
         if (kv_key)   { free(kv_key);   kv_key   = NULL; }
         if (kv_value) { free(kv_value); kv_value = NULL; }
     }
-    DEBUG_LOG(TAG_INI, "kv_item: %p", kv_item);
+    Q_DEBUG_LOG(TAG_CFGP, "kv_item: %p", kv_item);
     return kv_item;
 }
 
@@ -451,7 +437,7 @@ struct cfgp_kv *cfgp_add_key_value(struct configparser *hdl,
             kv_item = cfgp_add_kv(pos, key, value);
         }
     } while (0);
-    DEBUG_LOG(TAG_INI, "kv_item: %p", kv_item);
+    Q_DEBUG_LOG(TAG_CFGP, "kv_item: %p", kv_item);
     return kv_item;
 }
 
@@ -499,7 +485,7 @@ int cfgp_read(struct configparser *hdl, const char *path)
             break;
         }
         if (access(path, F_OK)) {
-            DEBUG_LOG(TAG_INI, "file does not exist");
+            Q_DEBUG_LOG(TAG_CFGP, "file does not exist");
             break;
         }
         if (!(fp = fopen(path, "rb"))) {
@@ -512,11 +498,11 @@ int cfgp_read(struct configparser *hdl, const char *path)
             --nread;
             line[nread] = '\0';
             line_type   = cfgp_linetype(line);
-            DEBUG_LOG(TAG_INI, "line_type: %d, line: %2ld -> %s", line_type, nread, line);
+            Q_DEBUG_LOG(TAG_CFGP, "line_type: %d, line: %2ld -> %s", line_type, nread, line);
 
             if (LINE_TYPE_SECTION == line_type) {
                 section = cfgp_fix_section(line);
-                DEBUG_LOG(TAG_INI, "section: %s", section);
+                Q_DEBUG_LOG(TAG_CFGP, "section: %s", section);
                 section = cfgp_add_section(hdl, section)->s_name;
             }
             else if (LINE_TYPE_KEY_VALUE == line_type) {
@@ -525,7 +511,7 @@ int cfgp_read(struct configparser *hdl, const char *path)
                 key   = strsep(&value, "=");
                 key   = cfgp_fx_value(key);
                 value = cfgp_fx_value(value);
-                DEBUG_LOG(TAG_INI, "section: %s, key: %s; value: %s", section, key, value);
+                Q_DEBUG_LOG(TAG_CFGP, "section: %s, key: %s; value: %s", section, key, value);
                 cfgp_add_key_value(hdl, section, key, value);
             }
         }
@@ -538,7 +524,7 @@ int cfgp_read(struct configparser *hdl, const char *path)
     if (fp) {
         fclose(fp);
     }
-    DEBUG_LOG(TAG_INI, "ret: %d", ret);
+    Q_DEBUG_LOG(TAG_CFGP, "ret: %d", ret);
     return ret;
 }
 
@@ -563,7 +549,7 @@ int cfgp_get_sections_count(struct configparser *hdl)
             ++count;
         }
     }
-    DEBUG_LOG(TAG_INI, "hdl: %p, count: %d", hdl, count);
+    Q_DEBUG_LOG(TAG_CFGP, "hdl: %p, count: %d", hdl, count);
     return count;
 }
 
@@ -598,7 +584,7 @@ int cfgp_get_sections(struct configparser *hdl,
             }
         }
     }
-    DEBUG_LOG(TAG_INI, "hdl: %p, index: %d, pos: %d", hdl, index, pos);
+    Q_DEBUG_LOG(TAG_CFGP, "hdl: %p, index: %d, pos: %d", hdl, index, pos);
     return (pos == index ? 0 : -1);
 }
 
@@ -637,7 +623,7 @@ int cfgp_get_kv_value(struct configparser *hdl,
         }
         strcpy(value, kv_item->value);
     } while (0);
-    DEBUG_LOG(TAG_INI, "hdl: %p, kv_item: %p", hdl, kv_item);
+    Q_DEBUG_LOG(TAG_CFGP, "hdl: %p, kv_item: %p", hdl, kv_item);
     return (kv_item ? 0 : -1);
 }
 
@@ -685,7 +671,7 @@ static int cfgp_write_to_fp(struct configparser *hdl)
         if (!(hdl->c_path)) {
             break;
         }
-        DEBUG_LOG(TAG_INI, "[path] %s", hdl->c_path);
+        Q_DEBUG_LOG(TAG_CFGP, "[path] %s", hdl->c_path);
         if (!(fp = fopen(hdl->c_path, "wb"))) {
             break;
         }
@@ -693,13 +679,13 @@ static int cfgp_write_to_fp(struct configparser *hdl)
         s_head = &hdl->sections.s_list;
         q_list_for_each(s_pos, s_head) {
             s_entry = q_list_entry(s_pos, struct cfgp_sec, s_list);
-            DEBUG_LOG(TAG_INI, "> %s", s_entry->s_name);
+            Q_DEBUG_LOG(TAG_CFGP, "> %s", s_entry->s_name);
             fprintf(fp, "\n[%s]\n", s_entry->s_name);
 
             kv_head = &s_entry->kvs.kv_list;
             q_list_for_each(kv_pos, kv_head) {
                 kv_entry = q_list_entry(kv_pos, struct cfgp_kv, kv_list);
-                DEBUG_LOG(TAG_INI, "  >> %s = %s", kv_entry->key, kv_entry->value);
+                Q_DEBUG_LOG(TAG_CFGP, "  >> %s = %s", kv_entry->key, kv_entry->value);
                 fprintf(fp, "%s = %s\n", kv_entry->key, kv_entry->value);
             }
         }
@@ -707,7 +693,7 @@ static int cfgp_write_to_fp(struct configparser *hdl)
     if (fp) {
         fclose(fp);
     }
-    DEBUG_LOG(TAG_INI, "ret: %d", ret);
+    Q_DEBUG_LOG(TAG_CFGP, "ret: %d", ret);
     return ret;
 }
 
@@ -728,7 +714,7 @@ int cfgp_write(struct configparser *hdl, const char *path)
         cfgp_add_path(hdl, path);
         ret = cfgp_write_to_fp(hdl);
     }
-    DEBUG_LOG(TAG_INI, "ret: %d", ret);
+    Q_DEBUG_LOG(TAG_CFGP, "ret: %d", ret);
     return ret;
 }
 
@@ -750,16 +736,16 @@ void cfgp_list(struct configparser *hdl)
     struct q_list_head *kv_pos   = NULL;
     struct cfgp_kv  *kv_entry = NULL;
 
-    DEBUG_LOG(TAG_INI, "[path] %s", hdl->c_path);
+    Q_DEBUG_LOG(TAG_CFGP, "[path] %s", hdl->c_path);
     s_head = &hdl->sections.s_list;
     q_list_for_each(s_pos, s_head) {
         s_entry = q_list_entry(s_pos, struct cfgp_sec, s_list);
-        DEBUG_LOG(TAG_INI, "> %s", s_entry->s_name);
+        Q_DEBUG_LOG(TAG_CFGP, "> %s", s_entry->s_name);
 
         kv_head = &s_entry->kvs.kv_list;
         q_list_for_each(kv_pos, kv_head) {
             kv_entry = q_list_entry(kv_pos, struct cfgp_kv, kv_list);
-            DEBUG_LOG(TAG_INI, "  >> %s = %s", kv_entry->key, kv_entry->value);
+            Q_DEBUG_LOG(TAG_CFGP, "  >> %s = %s", kv_entry->key, kv_entry->value);
         }
     }
 }
