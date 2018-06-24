@@ -16,7 +16,7 @@ static struct timer_desc desc_1;
 static struct timer_desc desc_2;
 
 
-static void *timer_cb(void *data)
+static void timer_cb(void *data)
 {
     uint64_t remaining;
     Q_DEBUG_LOG(TAG_TEST, "data: %p", data);
@@ -53,8 +53,8 @@ int main(int argc, char const *argv[])
     log_tags_add(TAG_TEST);
     log_tags_add(TAG_TIMER);
 
-    test_timer_exec_none();
-    // test_timer_exec_pthread();
+    // test_timer_exec_none();
+    test_timer_exec_pthread();
 
     while (1);
     return 0;

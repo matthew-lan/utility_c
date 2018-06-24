@@ -30,9 +30,9 @@
 /* timer descriptor */
 struct timer_desc
 {
-    int  timer_id;         /* timer handle */
+    int  timer_id;          /* timer handle */
     void *data;             /* private data which be passed to func */
-    void *(*func)(void *);  /* callback function */
+    void (*func)(void *);   /* callback function */
     int  exec_type;         /* how to call func:
                              *   EXEC_TYPE_NONE    : only call the function
                              *   EXEC_TYPE_PTHREAD : create a pthread to call

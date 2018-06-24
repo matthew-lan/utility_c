@@ -37,6 +37,23 @@ static int epfd    = 0;
  * Fucntions
 **********************************************************/
 /**
+ * [timer_fd_execute_pthread description]
+ *
+ * @param   arg  [description]
+ *
+ * @return       [description]
+ */
+static void *timer_fd_execute_pthread(void *arg)
+{
+    struct timer_desc *desc = (struct timer_desc *)arg;
+    // Q_DEBUG_LOG(TAG_TIMER, "called");
+    if (desc && desc->func) {
+        desc->func(desc->data);
+    }
+    return NULL;
+}
+
+/**
  * [timer_fd_execute description]
  * execute user's callback function.
  *
@@ -57,7 +74,7 @@ static void timer_fd_execute(void *ptr)
         }
         else if (EXEC_TYPE_PTHREAD == desc->exec_type) {
             pthread_t thread;
-            if (!pthread_create(&thread, NULL, desc->func, desc->data)) {
+            if (!pthread_create(&thread, NULL, timer_fd_execute_pthread, ptr)) {
                 pthread_detach(thread);
             }
         }
