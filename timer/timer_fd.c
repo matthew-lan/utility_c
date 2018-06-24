@@ -37,13 +37,13 @@ static int epfd    = 0;
  * Fucntions
 **********************************************************/
 /**
- * [timer_fd_execute_pthread description]
+ * [timer_fd_execute_thread description]
  *
  * @param   arg  [description]
  *
  * @return       [description]
  */
-static void *timer_fd_execute_pthread(void *arg)
+static void *timer_fd_execute_thread(void *arg)
 {
     struct timer_desc *desc = (struct timer_desc *)arg;
     // Q_DEBUG_LOG(TAG_TIMER, "called");
@@ -72,9 +72,9 @@ static void timer_fd_execute(void *ptr)
         if (EXEC_TYPE_NONE == desc->exec_type) {
             desc->func(desc->data);
         }
-        else if (EXEC_TYPE_PTHREAD == desc->exec_type) {
+        else if (EXEC_TYPE_THREAD == desc->exec_type) {
             pthread_t thread;
-            if (!pthread_create(&thread, NULL, timer_fd_execute_pthread, ptr)) {
+            if (!pthread_create(&thread, NULL, timer_fd_execute_thread, ptr)) {
                 pthread_detach(thread);
             }
         }
@@ -82,14 +82,14 @@ static void timer_fd_execute(void *ptr)
 }
 
 /**
- * [timer_fd_pthread_start description]
- * the pthread to listen timers.
+ * [timer_fd_thread_start description]
+ * the thread to listen timers.
  *
  * @param   arg  [description]
  *
  * @return       [description]
  */
-static void *timer_fd_pthread_start(void *arg)
+static void *timer_fd_thread_start(void *arg)
 {
     struct epoll_event *events = NULL;
     int                nfds    = 0;
@@ -141,7 +141,7 @@ static int timer_fd_init(void)
         }
 
         pthread_t thread;
-        if (pthread_create(&thread, NULL, timer_fd_pthread_start, NULL)) {
+        if (pthread_create(&thread, NULL, timer_fd_thread_start, NULL)) {
             ret = -1;
             break;
         }
@@ -252,11 +252,11 @@ int timer_fd_start(struct timer_desc *desc, uint64_t ms, uint64_t reload_ms)
         }
         struct itimerspec spec = {
             .it_value = {
-                .tv_sec = ms /1000,
+                .tv_sec  = ms /1000,
                 .tv_nsec = ms %1000 *1000000,
             },
             .it_interval = {
-                .tv_sec = reload_ms /1000,
+                .tv_sec  = reload_ms /1000,
                 .tv_nsec = reload_ms %1000 *1000000,
             },
         };

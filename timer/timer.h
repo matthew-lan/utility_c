@@ -25,7 +25,7 @@
  * Types
 **********************************************************/
 #define EXEC_TYPE_NONE      0
-#define EXEC_TYPE_PTHREAD   1
+#define EXEC_TYPE_THREAD    1
 
 /* timer descriptor */
 struct timer_desc
@@ -34,8 +34,10 @@ struct timer_desc
     void *data;             /* private data which be passed to func */
     void (*func)(void *);   /* callback function */
     int  exec_type;         /* how to call func:
-                             *   EXEC_TYPE_NONE    : only call the function
-                             *   EXEC_TYPE_PTHREAD : create a pthread to call
+                             *   EXEC_TYPE_NONE   : only call the function
+                             *   EXEC_TYPE_THREAD : create a pthread to call
+                             *
+                             * timer_posix_xxx(): ignore it
                              */
 };
 
@@ -43,6 +45,7 @@ struct timer_desc
 /**********************************************************
  * Fucntions
 **********************************************************/
+/* -lpthread */
 /* create timer handle */
 extern int timer_fd_create(struct timer_desc *desc);
 
@@ -63,6 +66,29 @@ extern int timer_fd_register(struct timer_desc *desc, uint64_t ms, uint64_t relo
 
 /* unregister timer include stop and close */
 extern int timer_fd_unregister(struct timer_desc *desc);
+
+
+/* -lrt */
+/* create timer handle */
+extern int timer_posix_create(struct timer_desc *desc);
+
+/* close timer handle */
+extern int timer_posix_close(struct timer_desc *desc);
+
+/* start timer */
+extern int timer_posix_start(struct timer_desc *desc, uint64_t ms, uint64_t reload_ms);
+
+/* stop timer */
+extern int timer_posix_stop(struct timer_desc *desc);
+
+/* get the remaining time of timer */
+extern int timer_posix_gettime(struct timer_desc *desc, uint64_t *ms);
+
+/* register timer include create and start */
+extern int timer_posix_register(struct timer_desc *desc, uint64_t ms, uint64_t reload_ms);
+
+/* unregister timer include stop and close */
+extern int timer_posix_unregister(struct timer_desc *desc);
 
 
 #endif // TIMER_H
