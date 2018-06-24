@@ -33,6 +33,8 @@
 **********************************************************/
 extern void log_level_set(int level);
 
+extern void log_tags_clr(void);
+extern void log_tags_add(const char *tag);
 extern void log_tags_set(const char *tags);
 
 extern void log_write_stdout(int prio, const char *tag, const char *format, ...);

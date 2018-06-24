@@ -5,7 +5,7 @@
 * @Last Modified time: 2018-06-24
 */
 
-
+#include <stdlib.h>
 #include "log/log.h"
 #include "timer/timer.h"
 
@@ -22,6 +22,8 @@ static void *timer_cb(void *data)
     Q_DEBUG_LOG(TAG_TEST, "data: %p", data);
     timer_fd_gettime(&desc_1, &remaining);
     timer_fd_unregister((struct timer_desc *)data);
+
+    exit(0);
 }
 
 static void test_timer_exec_none(void)
@@ -48,7 +50,8 @@ static void test_timer_exec_pthread(void)
 
 int main(int argc, char const *argv[])
 {
-    log_tags_set(TAG_TEST" "TAG_TIMER);
+    log_tags_add(TAG_TEST);
+    log_tags_add(TAG_TIMER);
 
     test_timer_exec_none();
     // test_timer_exec_pthread();

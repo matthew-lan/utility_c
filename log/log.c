@@ -2,7 +2,7 @@
 * @Author: matthew.lan
 * @Date:   2018-06-16
 * @Last Modified by:   matthew.lan
-* @Last Modified time: 2018-06-16
+* @Last Modified time: 2018-06-24
 */
 
 
@@ -14,6 +14,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"
+
+
+/**********************************************************
+ * Macros
+**********************************************************/
+#define LOG_TAGS_BUF_SIZE       128
 
 
 /**********************************************************
@@ -37,19 +43,50 @@ void log_level_set(int level)
 }
 
 /**
+ * [log_tags_clr description]
+ */
+void log_tags_clr(void)
+{
+    if (log_tags) {
+        free(log_tags);
+        log_tags = NULL;
+    }
+}
+
+/**
+ * [log_tags_add description]
+ *
+ * @param  tag  [description]
+ */
+void log_tags_add(const char *tag)
+{
+    do {
+        if (!tag) {
+            break;
+        }
+        if (!log_tags) {
+            log_tags = (char *)calloc(1, LOG_TAGS_BUF_SIZE);
+        }
+        if (log_tags) {
+            snprintf(log_tags + strlen(log_tags), LOG_TAGS_BUF_SIZE, "%s ", tag);
+        }
+    } while (0);
+}
+
+/**
  * [log_tags_set description]
  *
  * @param  tags  [description]
  */
 void log_tags_set(const char *tags)
 {
-    if (tags) {
-        if (log_tags) {
-            free(log_tags);
-            log_tags = NULL;
+    do {
+        if (!tags) {
+            break;
         }
-        log_tags = strdup(tags);
-    }
+        log_tags_clr();
+        log_tags_add(tags);
+    } while (0);
 }
 
 /**
