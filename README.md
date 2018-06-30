@@ -3,17 +3,23 @@ C utility functions in linux
 
 
 
-## log
-debug log
+## configparser
+like python configparse
+
+## ipc
+message queue: system V mq (mq_sysv)
 
 ## list
 linux kernel list
 
-## configparser
-like python configparse
+## log
+debug log
 
 ## sort
 sorting algorithm
 
 ## tests
 unit tests
+
+## timer
+linux specific timer (timer_fd), posix timer (timer_posix)
