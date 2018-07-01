@@ -2,7 +2,7 @@
 * @Author: matthew.lan
 * @Date:   2018-06-30
 * @Last Modified by:   matthew.lan
-* @Last Modified time: 2018-06-30
+* @Last Modified time: 2018-07-01
 */
 
 
@@ -103,9 +103,9 @@ int main(int argc, char const *argv[])
     test_thread_2(NULL);
 
 err_thread:
-    mq_destroy(&mq_hdl_2);
+    mq_destroy(&mq_hdl_2, TEST_MSGKEY_2);
 err_mq_2:
-    mq_destroy(&mq_hdl_1);
+    mq_destroy(&mq_hdl_1, TEST_MSGKEY_1);
 err_mq_1:
     return 0;
 }

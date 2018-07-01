@@ -7,7 +7,7 @@ CFLAGS = -I../../ -lpthread
 target = test_mq
 
 obj = test_mq.o log.o
-obj += mq_sysv.o
+obj += mq_sysv.o mq_sysv_usr.o
 
 $(target): $(obj)
 	cc -o $@ $(obj) $(CFLAGS)

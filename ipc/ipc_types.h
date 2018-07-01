@@ -24,16 +24,4 @@
 #define FLAG_NOBLOCK    1
 
 
-/**********************************************************
- * Types
-**********************************************************/
-struct ipc_msg
-{
-    long msgtype;
-    char data[0];
-};
-
-#define IPC_MSG_HEAD_SIZE   sizeof(struct ipc_msg)
-
-
 #endif // IPC_TYPES_H
