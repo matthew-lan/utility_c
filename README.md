@@ -7,7 +7,7 @@ C utility functions in linux
 like python configparse
 
 ## ipc
-message queue: system V mq (mq_sysv)
+message queue: system V mq (mq_sysv), posix mq (mq_posix)
 
 ## list
 linux kernel list
