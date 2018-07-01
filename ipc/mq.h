@@ -38,7 +38,31 @@ static int mq_recvmsg(int *mq_hdl, long from, void *data, size_t size)
 }
 
 #elif defined MQ_POSIX
+/**********************************************************
+ * msg queue of Linux.
+**********************************************************/
+#include "mq_posix_usr.h"
 
+
+static inline int mq_create(mq_t *mq_hdl, const char *indicate, long maxmsg, long msgsize)
+{
+    return mq_pusr_create(mq_hdl, indicate, maxmsg, msgsize, FLAG_BLOCK);
+}
+
+static inline int mq_destroy(mq_t *mq_hdl, const char *indicate)
+{
+    return mq_pusr_destroy(mq_hdl, indicate);
+}
+
+static inline int mq_sendmsg(mq_t *mq_hdl, long to, const void *data, size_t size)
+{
+    return mq_pusr_sendmsg(mq_hdl, to, data, size);
+}
+
+static int mq_recvmsg(int *mq_hdl, long from, void *data, size_t size)
+{
+    return mq_pusr_recvmsg(mq_hdl, from, data, size);
+}
 
 #endif
 

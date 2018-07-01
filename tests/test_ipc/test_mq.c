@@ -11,21 +11,32 @@
 #include <unistd.h>
 
 #include "log/log.h"
-#define MQ_SYSTEMV
+
+// #define MQ_SYSTEMV
+#define MQ_POSIX
 #include "ipc/mq.h"
 
 #define TAG_TEST    "TEST"
 
 
-#ifdef MQ_SYSTEMV
-#define TEST_MSGKEY_1   1234
-#define TEST_MSGKEY_2   1235
-
 #define TEST_MAXMSG     10
 #define TEST_MSGSIZE    128
 
-static mq_t mq_hdl_1 = -1;
-static mq_t mq_hdl_2 = -1;
+#ifdef  MQ_SYSTEMV
+#define TEST_MSGKEY_1   1234
+#define TEST_MSGKEY_2   1235
+
+static mq_t mq_hdl_1 = INVALID_MQ_ID;
+static mq_t mq_hdl_2 = INVALID_MQ_ID;
+
+
+#elif   defined MQ_POSIX
+#define TEST_MSGKEY_1   "/thread_1"
+#define TEST_MSGKEY_2   "/thread_2"
+
+static mq_t mq_hdl_1 = INVALID_MQDES;
+static mq_t mq_hdl_2 = INVALID_MQDES;
+
 #endif
 
 enum TASK_ID
