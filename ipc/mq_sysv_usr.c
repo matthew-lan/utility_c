@@ -46,7 +46,7 @@ int mq_vusr_create(mq_t *mq_hdl, int msgkey, long maxmsg, long msgsize, int flag
         if (!mq_hdl) {
             break;
         }
-        if (-1 == (*mq_hdl = mq_create_v(msgkey))) {
+        if (INVALID_MQ_ID == (*mq_hdl = mq_create_v(msgkey))) {
             break;
         }
         g_msgsize = msgsize;
@@ -77,7 +77,7 @@ int mq_vusr_destroy(mq_t *mq_hdl, int msgkey)
         if ((ret = mq_destroy_v(*mq_hdl))) {
             break;
         }
-        *mq_hdl = -1;
+        *mq_hdl = INVALID_MQ_ID;
         (void)msgkey;
     } while (0);
     Q_DEBUG_LOG(TAG_MQ, "ret: %d", ret);
@@ -109,7 +109,7 @@ int mq_vusr_sendmsg(mq_t *mq_hdl, long to, const void *data, size_t size)
         }
         msgp->msgtype = to;
         memcpy(msgp->data, data, size);
-        if (-1 == mq_sendmsg_v(*mq_hdl, msgp, g_msgsize, FLAG_BLOCK)) {
+        if (-1 == mq_sendmsg_v(*mq_hdl, msgp, g_msgsize, g_flag)) {
             break;
         }
         ret = 0;
@@ -145,7 +145,7 @@ int mq_vusr_recvmsg(mq_t *mq_hdl, long from, void *data, size_t size)
             break;
         }
         msgp->msgtype = from;
-        if (-1 == mq_recvmsg_v(*mq_hdl, msgp, g_msgsize, FLAG_BLOCK)) {
+        if (-1 == mq_recvmsg_v(*mq_hdl, msgp, g_msgsize, g_flag)) {
             break;
         }
         memcpy(data, msgp->data, size);

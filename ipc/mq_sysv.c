@@ -113,9 +113,6 @@ ssize_t mq_recvmsg_v(int mq_id, struct msg_sysv *msgp, size_t size, int flag)
             break;
         }
         rdbyte = msgrcv(mq_id, msgp, size, msgp->msgtype, FLAG_BLOCK == flag ? 0 : IPC_NOWAIT);
-        if (-1 == rdbyte) {
-            break;
-        }
     } while (0);
     Q_DEBUG_LOG(TAG_MQ, "rdbyte: %lld", rdbyte);
     return rdbyte;
