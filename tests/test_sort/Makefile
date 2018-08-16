@@ -1,6 +1,6 @@
 
 # libutils.so
-CFLAGS = -I../../ -Wl,-rpath,../../ -L../../ -lutils -lpthread -lrt
+CFLAGS = -I../../ -Wl,-rpath,../../ -L../../build -lutils -lpthread -lrt
 
 target = test_sort
 

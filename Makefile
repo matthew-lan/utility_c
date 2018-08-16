@@ -1,42 +1,48 @@
 
-BUILDPATH = ./build
+top_srcdir   = .
+top_builddir = ${top_srcdir}/build
 
-PREBUILD = prebuild
 LIB_A    = libutils.a
 LIB_SO   = libutils.so
 
 
-lib_SRCPATH  = configparser
-lib_SRCPATH += ipc
-lib_SRCPATH += list
-lib_SRCPATH += log
-lib_SRCPATH += sort
-lib_SRCPATH += timer
+lib_SRCPATH += ${top_srcdir}/configparser
+lib_SRCPATH += ${top_srcdir}/ipc
+lib_SRCPATH += ${top_srcdir}/list
+lib_SRCPATH += ${top_srcdir}/log
+lib_SRCPATH += ${top_srcdir}/sort
+lib_SRCPATH += ${top_srcdir}/timer
 
 
 lib_SOURCES = $(foreach dir, ${lib_SRCPATH}, $(wildcard ${dir}/*.c))
-lib_OBJS    = $(patsubst %.c, %.o, ${lib_SOURCES})
+lib_OBJS    = $(patsubst ${top_srcdir}/%.c, ${top_builddir}/%.o, ${lib_SOURCES})
 
-CFLAGS  = -I./  #-w
-LDFLAGS = -lpthread -lrt
+lib_CFLAGS  += -I./
+lib_CFLAGS  += -Wno-int-to-pointer-cast
+lib_CFLAGS  += -Wno-pointer-to-int-cast
 
+lib_LDADD   += -lpthread
+lib_LDADD   += -lrt
+
+CFLAGS = -g
+
+CC     = gcc
+AR     = ar
 
 .PHONY:all
-all: ${PREBUILD} ${LIB_A} ${LIB_SO}
-
-${PREBUILD}:
-	-mkdir -p $(foreach dir, ${lib_SRCPATH}, ${BUILDPATH}/${dir})
+all: ${LIB_A} ${LIB_SO}
 
 ${LIB_A}: ${lib_OBJS}
-	ar r $@ $(foreach obj, $^, $(wildcard ${BUILDPATH}/${obj}))
+	${AR} r ${top_builddir}/$@ $^
 
 ${LIB_SO}: ${lib_OBJS}
-	gcc -g -shared -o $@ $(foreach obj, $^, $(wildcard ${BUILDPATH}/${obj}))
+	${CC} ${CFLAGS} -shared -o ${top_builddir}/$@ $^
 
-${lib_OBJS}: %.o: %.c
-	gcc -g -c -fPIC -o ${BUILDPATH}/$@ $< ${CFLAGS} ${LDFLAGS}
+${lib_OBJS}: ${top_builddir}/%.o: ${top_srcdir}/%.c
+	@-mkdir -p ${dir $@}
+	${CC} ${CFLAGS} -c -fPIC -o $@ $< ${lib_CFLAGS} ${lib_LDADD}
 
 
 .PHONY:clean
 clean:
-	-rm -rf ${LIB_A} ${LIB_SO} ${BUILDPATH}
+	-rm -rf ${top_builddir}

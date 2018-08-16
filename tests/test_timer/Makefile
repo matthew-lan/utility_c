@@ -1,9 +1,9 @@
 
 # libutils.so
-CFLAGS = -I../../ -Wl,-rpath,../../ -L../../ -lutils -lpthread -lrt
+CFLAGS = -I../../ -Wl,-rpath,../../ -L../../build -lutils -lpthread -lrt
 
 # libutils.a
-# CFLAGS = -I../../ -L../../ -lutils -lpthread -lrt
+# CFLAGS = -I../../ -L../../build -lutils -lpthread -lrt
 
 target = test_timer
 
